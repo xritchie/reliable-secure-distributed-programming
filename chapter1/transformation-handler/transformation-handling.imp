@@ -1,0 +1,28 @@
+Implements:
+	TransformationHandler, instance th. 
+
+Uses:
+	JobHandler, instance jh.
+
+upon event ⟨ th, Init ⟩ do 
+	top := 1;
+	bottom := 1; 
+	handling := FALSE; 
+	buffer := [⊥]^M; 						//Initialize a vector of size M with values ⊥
+
+upon event ⟨ th, Submit | job ⟩ do 
+	if bottom + M = top then				//Check whether the vector is full
+		trigger ⟨ th, Error | job ⟩; 		
+	else
+		buffer[(top mod M) + 1] := job; 	//(top % m) -> get current index of last added item
+		top := top + 1;
+		trigger ⟨ th, Confirm | job ⟩;
+
+upon bottom < top ∧ handling = FALSE do 
+	job := buffer[(bottom mod M) + 1]; 		//(bottom % m) -> get index of first added item
+	bottom := bottom + 1;
+	handling := TRUE;						//Lock resource before we get confirmation
+	trigger ⟨ jh, Submit | job ⟩;           //Submit job for handling and wait for response
+
+upon event ⟨ jh, Confirm | job ⟩ do
+	handling := FALSE;						//Unlock resource which will allow processing
