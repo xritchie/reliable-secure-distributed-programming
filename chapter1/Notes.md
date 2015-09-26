@@ -3,41 +3,41 @@ Notes:
 
 Events:
 -------
-	```
-	<Event | Attributes, ...>
-	```
-	- to disambiguate between events of the same name we use
-	```
-	<co, Event | Attribute, ...>
-	```
-	- co -> component defining the event
+```
+<Event | Attributes, ...>
+```
+- to disambiguate between events of the same name we use
+```
+<co, Event | Attribute, ...>
+```
+- co -> component defining the event
 
-	- Events from the same component are processed n the order in which they are triggered
- 	- FIFO order is only enforced on events among local components in a given stack.
- 	- We assume that ever process executes code triggered by events in a mutal exclusive way
- 	- Events in the same processes are not handled concurrently
+- Events from the same component are processed n the order in which they are triggered
+	- FIFO order is only enforced on events among local components in a given stack.
+	- We assume that ever process executes code triggered by events in a mutal exclusive way
+	- Events in the same processes are not handled concurrently
 
- 	**Event Handling and Triggering**
- 	```
- 	upon event <co1, Event1 | Attr1, Attr2, ...> do
- 		do something;
- 		trigger<co2, Event2 | AttrA, AttrB, ...>
- 	```
-
- 	**Local Conidition Handling**
- 	- do not respond to external events originating from different components;
- 	```
- 	upon <coniditon> do
- 		do something;
+	**Event Handling and Triggering**
 	```
-
-	**External Events, Local Condition**
-	- Events from another module can also be qualified with a conidtion on local variable.
-	```
-	upon event <co, Event | attr, ...> Such that <Condition> do
+	upon event <co1, Event1 | Attr1, Attr2, ...> do
 		do something;
+		trigger<co2, Event2 | AttrA, AttrB, ...>
 	```
-	- An algorithm that uses conditional event handlers relies on the runtime system to buffer external events until the conidition on internal variables becomes satisfied.
+
+	**Local Conidition Handling**
+	- do not respond to external events originating from different components;
+	```
+	upon <coniditon> do
+		do something;
+```
+
+**External Events, Local Condition**
+- Events from another module can also be qualified with a conidtion on local variable.
+```
+upon event <co, Event | attr, ...> Such that <Condition> do
+	do something;
+```
+- An algorithm that uses conditional event handlers relies on the runtime system to buffer external events until the conidition on internal variables becomes satisfied.
 
 APIs
 -----
