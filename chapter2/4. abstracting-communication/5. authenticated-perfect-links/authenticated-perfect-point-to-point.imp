@@ -1,0 +1,17 @@
+Implements:
+	AuthPerfectPointToPointLinks, instance al.
+
+Uses:
+	StubbornPointToPointLinks, instance sl.
+
+upon event ⟨ al, Init ⟩ do 
+	delivered := ∅;
+
+upon event ⟨ al, Send | q, m ⟩ do 
+	a := authenticate(self, q, m); 
+	trigger ⟨ sl, Send | q, [m, a] ⟩;
+
+upon event ⟨ sl, Deliver | p, [m, a] ⟩ do
+	if verifyauth(self, p, m, a) ∧ !(m ∈ delivered) then
+		delivered := delivered ∪ {m}; 
+		trigger ⟨ al, Deliver | p, m ⟩;

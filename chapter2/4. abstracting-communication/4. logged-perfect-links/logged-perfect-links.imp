@@ -1,0 +1,21 @@
+Implements:
+	LoggedPerfectPointToPointLinks, instance lpl. 
+Uses:
+	StubbornPointToPointLinks, instance sl.
+
+upon event ⟨ lpl, Init ⟩ do
+	 delivered := ∅;
+	store(delivered);
+
+upon event ⟨ lpl, Recovery ⟩ do 
+	retrieve (delivered);
+	trigger ⟨ lpl, Deliver | delivered ⟩; 
+
+upon event⟨lpl,Send |q,m⟩do
+	trigger ⟨ sl, Send | q, m ⟩;
+
+upon event ⟨ sl, Deliver | p, m ⟩ do
+	if not exists (p′, m′) ∈ delivered such that m′ = m then
+		delivered := delivered ∪ {(p, m)}; 
+		store(delivered);
+	trigger ⟨ lpl, Deliver | delivered ⟩;

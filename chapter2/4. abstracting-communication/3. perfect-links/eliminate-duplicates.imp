@@ -1,0 +1,18 @@
+Implements:
+	PerfectPointToPointLinks, instance pl. 
+Uses:
+	StubbornPointToPointLinks, instance sl. 
+
+upon event ⟨ pl, Init ⟩ do
+	delivered := ∅; 
+
+upon event⟨pl,Send |q,m⟩do
+	trigger ⟨ sl, Send | q, m ⟩;
+
+upon event ⟨ sl, Deliver | p, m ⟩ do 
+	if !(m ∈ delivered) then
+		delivered := delivered ∪ {m}; 
+		trigger ⟨ pl, Deliver | p, m ⟩;
+
+
+At first glance, one might think of a simple way to circumvent this issue by having the target process acknowledge messages periodically and the sender pro- cess acknowledge having received such acknowledgments and promise not to send those messages anymore. There is no guarantee, however, that such messages are no longer in transit and will reach the target process afterward. The latter process might deliver the message again in this case, violating the no creation property. Additional mechanisms based on timestamps could be used, however, to recognize such old messages and to circumvent this problem.

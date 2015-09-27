@@ -1,0 +1,26 @@
+Implements:
+	StubbornPointToPointLinks, instance sl. 
+
+Uses:
+	FairLossPointToPointLinks, instance fll.
+
+upon event ⟨ sl, Init ⟩ do 
+	sent := ∅;
+	starttimer (Δ);
+
+upon event ⟨ Timeout ⟩ do 
+	forall (q, m) ∈ sent do
+		trigger ⟨ fll, Send | q, m ⟩; 
+	starttimer (Δ);
+
+uponevent⟨sl,Send |q,m⟩do 
+	trigger ⟨ fll, Send | q, m ⟩; 
+	sent := sent ∪ {(q, m)};
+
+
+upon event ⟨ fll, Deliver | p, m ⟩ do 
+	trigger ⟨ sl, Deliver | p, m ⟩;
+
+
+- infinitely often are context-dependent: they basically depend on the algorithm making use of stubborn links. After the algorithm making use of those links has ended its execution, there is no need to keep on sending messages
+- Second, an acknowledgment mechanism can be added to notify a sender that it does not need to keep on sending a given set of messages any more.
