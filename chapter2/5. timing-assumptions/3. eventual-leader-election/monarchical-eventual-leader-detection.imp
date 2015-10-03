@@ -1,0 +1,19 @@
+Implements:
+	EventualLeaderDetector, instance Ω. 
+
+Uses:
+	EventuallyPerfectFailureDetector, instance <>P.
+
+upon event ⟨ Ω, Init ⟩ do 
+	suspected := ∅;
+	leader := ⊥;
+
+upon event ⟨ QP, Suspect | p ⟩ do
+	suspected := suspected ∪ {p}; 
+
+upon event ⟨ QP, Restore | p ⟩ do
+	suspected := suspected \ {p};
+
+upon leader != maxrank(Π \ suspected) do 
+	leader := maxrank(Π \ suspected); 
+	trigger ⟨ Ω, Trust | leader ⟩;

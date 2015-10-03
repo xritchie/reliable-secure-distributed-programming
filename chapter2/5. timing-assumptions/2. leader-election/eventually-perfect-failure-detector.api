@@ -1,0 +1,8 @@
+Module:
+	Name: EventuallyPerfectFailureDetector, instance QP. 
+Events:
+	Indication: ⟨ QP , Suspect | p ⟩: Notifies that process p is suspected to have crashed.
+	Indication: ⟨ QP, Restore | p ⟩: Notifies that process p is not suspected anymore. 
+Properties:
+	EPFD1: Strong completeness: Eventually, every process that crashes is perma- nently suspected by every correct process.
+	EPFD2: Eventual strong accuracy: Eventually, no correct process is suspected by any correct process.

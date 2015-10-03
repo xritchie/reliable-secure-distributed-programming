@@ -1,0 +1,16 @@
+Implements:
+	LeaderElection, instance le.
+
+Uses:
+	PerfectFailureDetector, instance P.
+
+upon event ⟨ le, Init ⟩ do 
+	suspected := ∅;
+	leader := ⊥;
+
+uponevent⟨P,Crash |p⟩do
+	suspected := suspected ∪ {p};
+
+upon leader != maxrank(Π \ suspected) do 	//Once leader isnt inside the process list minus the suspected failures
+	leader := maxrank(Π \ suspected); 
+	trigger ⟨ le, Leader | leader ⟩;

@@ -1,0 +1,32 @@
+Implements:
+	EventuallyPerfectFailureDetector, instance <>P.
+
+Uses:
+	PerfectPointToPointLinks, instance pl.
+
+
+upon event ⟨ <>P, Init ⟩ do 
+	alive := Π;
+	suspected := ∅; 
+	delay := Δ; 
+	starttimer (delay);
+
+upon event ⟨ Timeout ⟩ do
+	if alive ∩ suspected != ∅ then
+		delay := delay + Δ;
+	forall p ∈ Π do
+		if !(p ∈ alive) ∧ !(p ∈ suspected) then 
+			suspected := suspected ∪ {p}; 
+			trigger ⟨ QP, Suspect | p ⟩;
+		else if (p ∈ alive) ∧ (p ∈ suspected) then 
+			suspected := suspected \ {p}; 
+			trigger ⟨ QP, Restore | p ⟩;
+		trigger ⟨ pl, Send | p, [HEARTBEATREQUEST] ⟩; 
+	alive := ∅;
+	starttimer (delay);
+
+upon event ⟨ pl, Deliver | q, [HEARTBEATREQUEST]⟩ do
+	trigger ⟨ pl, Send | q, [HEARTBEATREPLY] ⟩;
+
+upon event ⟨ pl, Deliver | p, [HEARTBEATREPLY]⟩ do
+	alive := alive ∪ {p};

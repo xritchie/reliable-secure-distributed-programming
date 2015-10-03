@@ -1,0 +1,35 @@
+Distributed-System Models
+--------------------------
+- A process abstraction
+- A link abstraction
+- Failure-detector abstraction
+
+- Fail-Stop
+    - crash-stop process abstraction (deterministic)
+    - Perfect links
+    - Perfect failure detector (P)
+- Fail-Noisy
+	- crash-stop process abstraction
+	- Perfect links
+	- Eventually perfect failure detector (<>P) or Eventual Leader detector (Ω)
+- Fail-Silent
+	- crash-stop process abstraction
+	- Perfect links
+	- No failure detectors or leader election abstraction
+- Fail-Recovery
+	- crash-recovery process abstraction
+		- process may forget what it did prior to crashing.
+	- stubborn links
+	- Eventual Leader detector (Ω)
+- Fail-Arbitrary 
+	-fail-silent-arbitrary
+		- Arbitrary/Byzantine process abstraction
+		- authenticated perfect link abstraction
+	- fail-noisy-arbitrary
+		- Arbitrary/Byzantine process abstraction
+		- authenticated perfect link abstraction
+		- Byzantine eventual leader-detector abstraction
+- Randomized
+	- non-determisistic
+	- only way to solve a problem or to circumvent inherent inefficiencies of deterministic algorithms
+

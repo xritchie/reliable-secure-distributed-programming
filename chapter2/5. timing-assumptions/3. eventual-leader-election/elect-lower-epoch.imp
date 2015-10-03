@@ -1,0 +1,44 @@
+Implements:
+	EventualLeaderDetector, instance Ω. 
+
+Uses:
+	FairLossPointToPointLinks, instance fll.
+
+upon event ⟨ Ω, Init ⟩ do 
+	epoch := 0;
+	store (epoch);
+	candidates := ∅;			//contains a pair <Process, Epoch>
+	trigger ⟨ Ω, Recovery ⟩;	//recovery procedure completes the initalization
+
+upon event ⟨ Ω, Recovery ⟩ do
+	leader := maxrank(Π); 
+	trigger ⟨ Ω, Trust | leader ⟩; 
+	delay := Δ;
+	retrieve (epoch);
+	epoch := epoch + 1; 
+	store (epoch);
+	forall p ∈ Π do
+￼		trigger ⟨ fll, Send | p, [HEARTBEAT, epoch] ⟩; 
+	candidates := ∅;
+	starttimer (delay);
+
+upon event ⟨ Timeout ⟩ do 
+	newleader := select(candidates); 
+	if newleader != leader then
+		delay := delay + Δ;
+		leader := newleader;
+		trigger ⟨ Ω, Trust | leader ⟩;
+		forall p ∈ Π do
+			trigger ⟨ fll, Send | p, [HEARTBEAT, epoch] ⟩;
+	candidates := ∅; 
+	starttimer (delay);
+
+upon event ⟨ fll, Deliver | q, [HEARTBEAT, ep] ⟩ do
+	if exists (s, e) ∈ candidates such that ((s == q) ∧ (e < ep)) then	//if canidates contains an old version
+		candidates := candidates \ {(q, e)}; 							//epoch remove it so it could be updated
+	candidates := candidates ∪ (q, ep);
+
+
+*select - that picks one process from cnadidates accoridng to the following rule;
+- it considers the process/epoch pairs in candidates with the lowest epoch number selects
+  corresponding process and returns the process with the highest rank amoung them.

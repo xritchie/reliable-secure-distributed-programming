@@ -1,0 +1,37 @@
+Implements:
+	ByzantineLeaderDetector, instance bld. 
+
+Uses:
+	AuthPerfectPointToPointLinks, instance al.
+
+upon event ⟨ bld, Init ⟩ do 
+	round := 1;						//Initial Round
+	complainlist := [⊥]^N ;			//Default the complaint array to empty
+	complained := FALSE;			
+	trigger ⟨ bld, Trust | leader(round) ⟩;
+
+upon event ⟨ bld, Complain | p ⟩ such that p = leader(round) and complained = FALSE do
+	complained := TRUE; 
+	forall q ∈ Π do
+		trigger ⟨ al, Send | q, [COMPLAINT, round] ⟩;
+
+upon event ⟨ al, Deliver | p, [COMPLAINT, r] ⟩ such that r = round and complainlist[p] = ⊥ do
+	complainlist[p] := COMPLAINT;
+	if #(complainlist) > f ∧ complained = FALSE then
+		complained := TRUE; 
+		forall q ∈ Π do
+			trigger ⟨ al, Send | q, [COMPLAINT, round] ⟩; 
+	else if #(complainlist) > 2f then
+		round := round + 1;
+		complainlist := [⊥]N ;
+		complained := FALSE;
+	trigger ⟨ bld, Trust | leader(round) ⟩;
+
+leader(r) {
+	var rank = r mod N;
+	if (rank != 0) {
+		rank(p)
+	} else {
+		rank(N)
+	}
+}
